@@ -10,6 +10,11 @@ public with sharing class AgentforceVisionKnowledgeAction {
     @TestVisible
     private static final Integer MAX_ARTICLES = 3;
 
+    // Wider SOSL pool so the relevance guard has candidates to rank and filter
+    // before trimming down to MAX_ARTICLES.
+    @TestVisible
+    private static final Integer CANDIDATE_POOL = 20;
+
     // Seam so tests can supply deterministic articles without depending on SOSL
     // fixed results and article publishing mechanics.
     @TestVisible
@@ -58,7 +63,14 @@ public with sharing class AgentforceVisionKnowledgeAction {
             return res;
         }
 
-        List<Knowledge__kav> articles = searcher.search(terms, MAX_ARTICLES);
+        List<Knowledge__kav> candidates = searcher.search(terms, CANDIDATE_POOL);
+        // Drop keyword-only collisions so the agent grounds its steps only in
+        // articles that are genuinely about the diagnosed item.
+        List<Knowledge__kav> articles = VisionArticleRelevance.selectRelevant(
+            req.keywords,
+            candidates,
+            MAX_ARTICLES
+        );
 
         if (articles == null || articles.isEmpty()) {
             res.articles = '';

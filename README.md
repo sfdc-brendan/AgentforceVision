@@ -85,12 +85,15 @@ flowchart TD
     analyze --> prompt["AgentforceVision_ImageDiagnosis<br/>flex prompt template + vision model"]
     prompt --> diag["Diagnosis + search keywords"]
     diag --> find["find_articles action<br/>AgentforceVisionKnowledgeAction (SOSL on Knowledge__kav)"]
-    find --> reply["Grounded troubleshooting steps"]
+    find --> guard["Relevance guard<br/>VisionArticleRelevance (drops keyword-only matches)"]
+    guard --> reply["Grounded troubleshooting steps<br/>(or 'no confident match' when nothing fits)"]
     agent --> esc["human_escalation<br/>VireonCreateCase / VireonAddCaseComment / VireonResolveCase"]
     esc --> case["Service Cloud Case worked by a virtual specialist"]
 ```
 
 Why a prompt template (and not a direct Models API call)? The Models API does not accept images; a **flex prompt template bound to a `ContentDocument` input** is the supported path for multimodal analysis. `AgentforceVisionImageAction` orchestrates that call with `ConnectApi.EinsteinLLM.generateMessagesForPromptTemplate`.
+
+Why a relevance guard? The vision model returns terse keywords that feed a `FIND ... IN ALL FIELDS` SOSL search, and matching on every field means a single shared or generic word can promote an unrelated article (for example, a *clothes dryer* photo matching a *hair dryer* article purely on the word "dryer"). `VisionArticleRelevance` re-ranks the SOSL candidates by how many **distinct, meaningful** keywords actually appear in each article's **Title/Summary**, ignores generic support words (power, reset, outlet, ...), and drops anything that clears only on one ambiguous term. When nothing is a confident match it returns **no article**, so the agent says it couldn't find specific guidance (and can escalate) rather than confidently handing over the wrong steps.
 
 How the photo gets in, on-platform:
 - **Agent / Enhanced Messaging chat**: the customer attaches a photo in the conversation.
@@ -107,6 +110,7 @@ How the photo gets in, on-platform:
 | --- | --- | --- |
 | Apex | `AgentforceVisionImageAction` | Analyze the uploaded image via the vision prompt template |
 | Apex | `AgentforceVisionKnowledgeAction` | SOSL search Knowledge and return grounded article content |
+| Apex | `VisionArticleRelevance` | Relevance guard that drops keyword-only Knowledge matches so the agent never grounds steps in an unrelated article |
 | Apex | `VireonCreateCase` / `VireonAddCaseComment` / `VireonResolveCase` | Virtual-human escalation: create, comment on, and resolve a Service Cloud Case |
 | Prompt template | `AgentforceVision_ImageDiagnosis` | Flex template bound to a `ContentDocument`, running a vision model |
 | Agent (Agent Script) | `Vireon_Support_Agent` | Routes to photo troubleshooting, Knowledge FAQ, and human escalation |
@@ -189,6 +193,7 @@ Want to try it on your machine without building a site? [`local-demo/`](local-de
 
 - **Company and content**: "Vireon" is fictional. Edit the system prompt and welcome message in `Vireon_Support_Agent.agent`, and replace the articles in `scripts/apex/create_vireon_knowledge.apex` with your own.
 - **Knowledge shape**: the search reads `Knowledge__kav.FAQ_Answer__c`. If your Knowledge uses a different body field, update `AgentforceVisionKnowledgeAction` and the field metadata.
+- **Match strictness**: tune the relevance guard in `VisionArticleRelevance` - `MIN_DISTINCT_TERM_MATCHES` (how many keywords must overlap for a confident match), `MIN_TERM_LENGTH`, and the generic-word `STOP_WORDS` set.
 - **Model**: change the vision model in Prompt Builder on the `AgentforceVision_ImageDiagnosis` template if `sfdc_ai__DefaultGPT55` isn't available in your org.
 - **Escalation**: the `Vireon*Case` classes assign a random "specialist" name and work the Case with comments; adjust the personas/logic to taste.
 
@@ -200,6 +205,7 @@ Want to try it on your machine without building a site? [`local-demo/`](local-de
 - **`sf agent publish` fails**: confirm Agentforce and a Service Agent license are enabled, and that the agent user bound in the bundle exists and is active in this org.
 - **"No image was found"**: the photo must be uploaded before analysis. In a live channel it's the chat attachment; when testing, upload the image first, then ask the agent within ~10 minutes.
 - **Agent gives generic/wrong steps**: make sure the Knowledge articles were seeded and published (`--skip-knowledge` was not set), and that the running user can read `FAQ_Answer__c`.
+- **Agent says it couldn't find a specific article for something you expect to match**: the `VisionArticleRelevance` guard requires a genuine Title/Summary keyword overlap, so photos with no matching article (or only a loose, single-word overlap) intentionally return no article. Add a Knowledge article whose Title/Summary contains the item's real terms, or relax the thresholds (`MIN_DISTINCT_TERM_MATCHES`, `MIN_TERM_LENGTH`) / stop-word list in `VisionArticleRelevance`.
 - **Vision model errors**: the template may point at a model your org lacks. Change it in Prompt Builder.
 
 ---
