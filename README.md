@@ -75,6 +75,8 @@ Full details: [Install](#install) - [Connect a channel](#connect-a-channel-so-cu
 
 ## How it works
 
+> New here? For a plain-language, step-by-step walkthrough of what happens when a customer uploads a photo in chat, see [docs/PHOTO-FLOW.md](docs/PHOTO-FLOW.md).
+
 The image never leaves Salesforce. A photo uploaded through any standard channel becomes a `ContentVersion`; the agent's `analyze_image` action passes that file to a **flex prompt template** bound to a vision model, then grounds the answer in Knowledge.
 
 ```mermaid
