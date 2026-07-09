@@ -132,6 +132,22 @@ Upload one of the photos in `demo-assets/vision-samples/` (each maps to a sample
 
 ---
 
+## Connect a channel (so customers can chat and upload photos)
+
+This package deploys the agent, not a channel. To let a customer upload a photo in a chat, use **Enhanced Messaging / Messaging for In-App and Web (MIAW)** - the modern "v2" experience, which supports end-user **file attachments**. Legacy Chat (v1 / Live Agent) does not offer that inbound-image-to-agent flow.
+
+1. Create/enable a Messaging for In-App and Web channel and deployment for the agent.
+2. In Setup > **Messaging Settings** > your channel > Edit, enable **"Let customers send attachments to agents."**
+3. Use the deployment's **Install Code** snippet on your site.
+
+Note: the `analyze_image` action doesn't rely on the runtime handing the image to the model - it resolves the photo the customer uploaded (linked to the `MessagingSession`, or the most recent upload) and runs it through the vision prompt template itself. That makes photo analysis work reliably regardless of a given org's native multimodal-attachment support.
+
+Other on-platform upload paths (no chat): a Screen Flow File Upload component on a Case, or Files attached to a record.
+
+## Local demo (optional)
+
+Want to try it on your machine without building a site? [`local-demo/`](local-demo/) is a tiny, dependency-free web page that hosts a branded landing page and loads Salesforce's **native Enhanced Messaging widget** (photo upload included). You paste your Embedded Messaging code snippet into a Settings panel - no backend, no credentials - and it connects straight to your agent. See [local-demo/README.md](local-demo/README.md).
+
 ## Customize / rebrand
 
 - **Company and content**: "Vireon" is fictional. Edit the system prompt and welcome message in `Vireon_Support_Agent.agent`, and replace the articles in `scripts/apex/create_vireon_knowledge.apex` with your own.
@@ -162,6 +178,7 @@ force-app/main/default/
   permissionsets/                            Agentforce_Vision
 scripts/apex/create_vireon_knowledge.apex    Sample Knowledge seeder
 demo-assets/vision-samples/                  Nine sample photos for testing
+local-demo/                                  Optional local web page (native messaging widget)
 install.sh                                   One-command installer
 ```
 
