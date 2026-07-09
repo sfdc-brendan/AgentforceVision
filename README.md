@@ -51,9 +51,9 @@ This deploys the metadata, seeds the sample Knowledge, and publishes + activates
 **2. Stand up an Enhanced Messaging channel for the agent** (so a customer can chat and upload a photo):
 - In Setup, open **Messaging Settings** and create a **Messaging for In-App and Web** channel, routing it to `Vireon_Support_Agent`.
 - Edit the channel and enable **"Let customers send attachments to agents."**
-- In Setup, open **Embedded Service Deployments** and create/verify a deployment tied to that channel, then **Publish** it.
+- In Setup, open **Embedded Service Deployments** and create a new deployment. When prompted for the deployment type (**Web**, **Mobile**, or **Custom Client**), choose **Custom Client** - this is what produces the pasteable bootstrap snippet the local demo uses. Tie it to the channel and **Publish** it.
 
-**3. Copy the code snippet:** in Setup > **Embedded Service Deployments** > your deployment > **Install Code**, copy the snippet (it contains `embeddedservice_bootstrap.init(...)` and a `bootstrap.min.js` script tag).
+**3. Copy the code snippet:** in Setup > **Embedded Service Deployments** > your **Custom Client** deployment > **Install Code**, copy the snippet (it contains `embeddedservice_bootstrap.init(...)` and a `bootstrap.min.js` script tag).
 
 **4. Start the local website:**
 
@@ -173,9 +173,9 @@ Upload one of the photos in `demo-assets/vision-samples/` (each maps to a sample
 
 This package deploys the agent, not a channel. To let a customer upload a photo in a chat, use **Enhanced Messaging / Messaging for In-App and Web (MIAW)** - the modern "v2" experience, which supports end-user **file attachments**. Legacy Chat (v1 / Live Agent) does not offer that inbound-image-to-agent flow.
 
-1. Create/enable a Messaging for In-App and Web channel and deployment for the agent.
+1. Create a Messaging for In-App and Web channel for the agent, then create an **Embedded Service Deployment** for it. When choosing the deployment type (**Web**, **Mobile**, or **Custom Client**), pick **Custom Client** - that's the option that generates the bootstrap code snippet you paste into your own page (and into the local demo).
 2. In Setup > **Messaging Settings** > your channel > Edit, enable **"Let customers send attachments to agents."**
-3. Use the deployment's **Install Code** snippet on your site.
+3. Use the Custom Client deployment's **Install Code** snippet on your site.
 
 Note: the `analyze_image` action doesn't rely on the runtime handing the image to the model - it resolves the photo the customer uploaded (linked to the `MessagingSession`, or the most recent upload) and runs it through the vision prompt template itself. That makes photo analysis work reliably regardless of a given org's native multimodal-attachment support.
 
