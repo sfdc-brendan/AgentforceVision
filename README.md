@@ -36,6 +36,43 @@ Additional notes:
 
 ---
 
+## Quickstart (end to end)
+
+Get from zero to a working, uploadable demo in five steps. Details for each are expanded in the sections below.
+
+**1. Install the Salesforce package** into an org that meets the prerequisites above:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/sfdc-brendan/AgentforceVision/main/install.sh)" -- -o <your-org-alias>
+```
+
+This deploys the metadata, seeds the sample Knowledge, and publishes + activates the `Vireon_Support_Agent`. (See [Install](#install).)
+
+**2. Stand up an Enhanced Messaging channel for the agent** (so a customer can chat and upload a photo):
+- In Setup, open **Messaging Settings** and create a **Messaging for In-App and Web** channel, routing it to `Vireon_Support_Agent`.
+- Edit the channel and enable **"Let customers send attachments to agents."**
+- In Setup, open **Embedded Service Deployments** and create/verify a deployment tied to that channel, then **Publish** it.
+
+**3. Copy the code snippet:** in Setup > **Embedded Service Deployments** > your deployment > **Install Code**, copy the snippet (it contains `embeddedservice_bootstrap.init(...)` and a `bootstrap.min.js` script tag).
+
+**4. Start the local website:**
+
+```bash
+git clone https://github.com/sfdc-brendan/AgentforceVision.git
+cd AgentforceVision/local-demo
+python3 -m http.server 8080      # or: npx serve -l 8080
+```
+
+Then, so the widget is allowed to load on localhost, add `http://localhost:8080` to your deployment's **allowed/trusted origins** in Setup > Embedded Service Deployments.
+
+**5. Connect and test:** open <http://localhost:8080>, click **Settings**, paste the snippet from step 3, and click **Save & connect**. The Salesforce chat button appears; open it, attach one of the photos in `demo-assets/vision-samples/`, and the agent diagnoses it and returns grounded steps.
+
+> Prefer not to run a website? You can test entirely from the CLI with `sf agent preview` (see [Test it](#test-it)), or embed the same snippet on any page you already have.
+
+Full details: [Install](#install) - [Connect a channel](#connect-a-channel-so-customers-can-chat-and-upload-photos) - [Local demo](#local-demo-optional) ([local-demo/README.md](local-demo/README.md)).
+
+---
+
 ## How it works
 
 The image never leaves Salesforce. A photo uploaded through any standard channel becomes a `ContentVersion`; the agent's `analyze_image` action passes that file to a **flex prompt template** bound to a vision model, then grounds the answer in Knowledge.
