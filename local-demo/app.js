@@ -97,6 +97,7 @@ if (originHint) originHint.textContent = location.origin;
 const saved = localStorage.getItem(STORAGE_KEY);
 if (saved) {
   setStatus(true);
+  if (window.AVTrack) window.AVTrack.event('agent_connected');
   injectSnippet(saved);
 } else {
   setStatus(false);
