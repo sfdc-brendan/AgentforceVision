@@ -191,7 +191,7 @@ subagent human_escalation:
 
     reasoning:
         instructions: ->
-            | The customer wants a human specialist. Reassure them in one short sentence that you're connecting them to a Brightwell specialist right now.
+            | The customer wants a human specialist. Reassure them in one short sentence that you're connecting them to a Brightwell specialist right now. Do NOT introduce yourself by name and do NOT claim to be the specialist in this step - you are still the assistant, and a named specialist takes over only after the case is open. Never use the customer's own name as the specialist's name.
               Summarize the issue from the conversation so far, then call {!@actions.create_case} to open a case. Provide a concise subject and a fuller issueDetails summary. Include the customer's name and email only if they were mentioned.
               Call create_case only ONCE. If it does not succeed, apologize briefly and ask the customer to try again in a moment - do NOT call it repeatedly.
               Do NOT use the show_command tool; respond as direct text.

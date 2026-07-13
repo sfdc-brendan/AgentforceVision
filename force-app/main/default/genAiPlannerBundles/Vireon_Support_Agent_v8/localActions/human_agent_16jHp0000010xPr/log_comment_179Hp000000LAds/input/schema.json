@@ -1,0 +1,28 @@
+{
+  "required" : [ "caseId", "commentBody" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "authorName" : {
+      "title" : "Author Name",
+      "description" : "Specialist display name.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "caseId" : {
+      "title" : "Case Id",
+      "description" : "Id of the case to comment on.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "commentBody" : {
+      "title" : "Comment Body",
+      "description" : "What the specialist did or advised this step.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}
