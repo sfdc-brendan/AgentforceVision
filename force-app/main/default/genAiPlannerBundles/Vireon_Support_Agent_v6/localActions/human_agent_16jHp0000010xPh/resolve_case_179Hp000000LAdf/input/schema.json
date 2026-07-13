@@ -1,0 +1,28 @@
+{
+  "required" : [ "caseId", "resolutionSummary" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "authorName" : {
+      "title" : "Author Name",
+      "description" : "Specialist display name.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "caseId" : {
+      "title" : "Case Id",
+      "description" : "Id of the case to resolve.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "resolutionSummary" : {
+      "title" : "Resolution Summary",
+      "description" : "How the issue was resolved.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

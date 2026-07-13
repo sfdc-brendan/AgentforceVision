@@ -1,0 +1,14 @@
+{
+  "required" : [ "keywords" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "keywords" : {
+      "title" : "Keywords",
+      "description" : "Keywords describing the question.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

@@ -81,7 +81,7 @@ public with sharing class VireonCreateCase {
                 : SPECIALIST_NAMES[randomIndex(SPECIALIST_NAMES.size())];
 
             Case c = new Case(
-                Subject = String.isBlank(req.subject) ? 'Vireon support request' : req.subject,
+                Subject = String.isBlank(req.subject) ? 'Brightwell support request' : req.subject,
                 Description = req.issueDetails,
                 Origin = 'Chat',
                 Status = 'Working',
@@ -105,7 +105,7 @@ public with sharing class VireonCreateCase {
 
             insert new CaseComment(
                 ParentId = c.Id,
-                CommentBody = '[' + name + '] Case created from the Vireon web chat and assigned to me. '
+                CommentBody = '[' + name + '] Case created from the Brightwell web chat and assigned to me. '
                     + 'I\'ll take it from here.',
                 IsPublished = true
             );
